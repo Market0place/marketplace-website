@@ -1,0 +1,7 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Notifications</title>
+<style>body{font-family:Inter,system-ui;background:#f7faf8;color:#10221b}.wrap{width:min(800px,94%);margin:35px auto}.card{background:white;border:1px solid #e4ebe7;border-radius:16px;padding:16px;margin:10px 0}.unread{border-left:4px solid #16845a}.muted{color:#66756f}.btn{padding:10px 13px;border:0;border-radius:9px;font-weight:800;cursor:pointer}</style></head><body><div class="wrap"><h1>Notifications</h1><button class="btn" onclick="readAll()">Mark all as read</button><div id="list">Loading...</div></div>
+<script>
+async function api(p,o={}){const t=localStorage.getItem('pm_token');o.headers={...(o.headers||{}),Authorization:'Bearer '+t,'Content-Type':'application/json'};const r=await fetch(p,o),d=await r.json();if(!r.ok)throw Error(d.error||'Failed');return d}
+async function load(){const d=await api('/api/notifications');list.innerHTML=d.length?d.map(n=>`<div class="card ${n.read_at?'':'unread'}"><b>${n.title}</b><p>${n.body}</p><small class="muted">${n.created_at}</small>${!n.read_at?`<br><button class="btn" onclick="read(${n.id})">Mark read</button>`:''}</div>`).join(''):'No notifications.'}
+async function read(id){await api('/api/notifications/'+id+'/read',{method:'POST'});load()}async function readAll(){await api('/api/notifications/read-all',{method:'POST'});load()}load()
+</script></body></html>
